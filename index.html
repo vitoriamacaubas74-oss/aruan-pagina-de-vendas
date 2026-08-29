@@ -4,28 +4,31 @@
 (function () {
   var duration = 15 * 60;
   var storageKey = 'aruan-offer-deadline-37-90';
-  var timer = document.querySelector('.offerTimer');
-  if (!timer) return;
+  var timers = document.querySelectorAll('.offerTimer');
+  if (!timers.length) return;
 
   var saved = Number(sessionStorage.getItem(storageKey));
   var deadline = saved || Date.now() + duration * 1000;
   if (!saved) sessionStorage.setItem(storageKey, String(deadline));
 
-  var heading = timer.querySelector('strong');
-  var digits = timer.querySelectorAll('.timerDigits b');
-  var digitWrap = timer.querySelector('.timerDigits');
-
   function updateTimer() {
     var remaining = Math.max(0, Math.ceil((deadline - Date.now()) / 1000));
     var minutes = String(Math.floor(remaining / 60)).padStart(2, '0');
     var seconds = String(remaining % 60).padStart(2, '0');
-    digits[0].textContent = minutes;
-    digits[1].textContent = seconds;
-    digitWrap.setAttribute('aria-label', minutes + ' minutos e ' + seconds + ' segundos');
-    if (remaining === 0) {
-      timer.classList.add('expired');
-      heading.textContent = 'Esta condi\u00e7\u00e3o promocional terminou';
-    }
+    timers.forEach(function (timer) {
+      var heading = timer.querySelector('strong');
+      var digits = timer.querySelectorAll('.timerDigits b');
+      var digitWrap = timer.querySelector('.timerDigits');
+      if (digits.length >= 2) {
+        digits[0].textContent = minutes;
+        digits[1].textContent = seconds;
+      }
+      if (digitWrap) digitWrap.setAttribute('aria-label', minutes + ' minutos e ' + seconds + ' segundos');
+      if (remaining === 0) {
+        timer.classList.add('expired');
+        if (heading) heading.textContent = 'Esta condi\u00e7\u00e3o promocional terminou';
+      }
+    });
   }
 
   updateTimer();
